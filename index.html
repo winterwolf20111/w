@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoriyaShrine - /b/ - Random</title>
+    <style>
+        :root {
+            --primary-color: #800080;
+            --secondary-color: #4B0082;
+            --background-color: #F0E6FF;
+            --post-color: #FFFFFF;
+            --text-color: #333333;
+            --danger-color: #FF4444;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .board-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .board {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        
+        .board.active {
+            background-color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .post-form {
+            background-color: var(--post-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .post-form textarea, .post-form input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .post-form button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .posts {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .post {
+            background-color: var(--post-color);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .post-content {
+            margin-bottom: 1rem;
+        }
+        
+        .post-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-bottom: 1rem;
+        }
+        
+        .comment-form {
+            margin-top: 1rem;
+        }
+        
+        .comments {
+            margin-top: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--secondary-color);
+        }
+        
+        .comment {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+        
+        .comment-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 0.5rem;
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>MoriyaShrine</h1>
+        <p>Where 4chan anonymity meets Reddit discussions</p>
+    </header>
+    
+    <div class="container">
+        <div class="board-list">
+            <a href="a.html" class="board">/a/ - Anime</a>
+            <a href="v.html" class="board">/v/ - Video Games</a>
+            <a href="g.html" class="board">/g/ - Technology</a>
+            <a href="b.html" class="board active">/b/ - Random</a>
+            <a href="mu.html" class="board">/mu/ - Music</a>
+        </div>
+        
+        <div class="post-form">
+            <h2>Create a new post</h2>
+            <form id="new-post-form">
+                <input type="text" id="post-title" placeholder="Title (optional)" maxlength="300">
+                <textarea id="post-content" placeholder="Your text here..." rows="4" required></textarea>
+                <input type="file" id="post-image" accept="image/*">
+                <button type="submit">Post</button>
+            </form>
+        </div>
+        
+        <div class="posts" id="posts-container">
+            <!-- Posts will be loaded here from localStorage -->
+        </div>
+    </div>
+    
+    <script>
+        // Data structure to hold posts
+        let postsData = {
+            currentBoard: 'b',
+            posts: []
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load posts from localStorage
+            loadPosts();
+            
+            // Handle new post submission
+            document.getElementById('new-post-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('post-title').value;
+                const content = document.getElementById('post-content').value;
+                const imageFile = document.getElementById('post-image').files[0];
+                
+                // Create a new post object
+                const newPost = {
+                    id: Date.now(),
+                    board: postsData.currentBoard,
+                    title: title,
+                    content: content,
+                    image: imageFile ? {
+                        name: imageFile.name,
+                        type: imageFile.type,
+                        data: null // Will be populated after reading
+                    } : null,
+                    comments: [],
+                    timestamp: new Date().toISOString()
+                };
+                
+                // If there's an image, read it as data URL
+                if (imageFile) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        newPost.image.data = e.target.result;
+                        addPostToData(newPost);
+                        renderPosts();
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    addPostToData(newPost);
+                    renderPosts();
+                }
+                
+                // Reset the form
+                this.reset();
+            });
+            
+            // Handle comment submission (delegated because comments forms are dynamic)
+            document.addEventListener('submit', function(e) {
+                if (e.target.classList.contains('new-comment-form')) {
+                    e.preventDefault();
+                    
+                    const form = e.target;
+                    const postId = parseInt(form.dataset.postId);
+                    const content = form.querySelector('textarea').value;
+                    const imageFile = form.querySelector('input[type="file"]').files[0];
+                    
+                    // Create a new comment object
+                    const newComment = {
+                        id: Date.now(),
+                        content: content,
+                        image: imageFile ? {
+                            name: imageFile.name,
+                            type: imageFile.type,
+                            data: null // Will be populated after reading
+                        } : null,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    // If there's an image, read it as data URL
+                    if (imageFile) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            newComment.image.data = e.target.result;
+                            addCommentToPost(postId, newComment);
+                            renderPosts();
+                        };
+                        reader.readAsDataURL(imageFile);
+                    } else {
+                        addCommentToPost(postId, newComment);
+                        renderPosts();
+                    }
+                    
+                    // Reset the form
+                    form.reset();
+                }
+            });
+            
+            // Handle post/comment deletion (delegated)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn')) {
+                    const isComment = e.target.classList.contains('comment-delete');
+                    const id = parseInt(e.target.dataset.id);
+                    
+                    if (isComment) {
+                        const postId = parseInt(e.target.dataset.postId);
+                        deleteComment(postId, id);
+                    } else {
+                        deletePost(id);
+                    }
+                    
+                    renderPosts();
+                }
+            });
+        });
+        
+        // Data management functions
+        function loadPosts() {
+            const savedData = localStorage.getItem('moriyashrine_posts');
+            if (savedData) {
+                postsData = JSON.parse(savedData);
+            }
+            
+            // Filter posts for current board
+            const currentBoardPosts = postsData.posts.filter(post => post.board === postsData.currentBoard);
+            postsData.posts = currentBoardPosts;
+            
+            renderPosts();
+        }
+        
+        function savePosts() {
+            localStorage.setItem('moriyashrine_posts', JSON.stringify(postsData));
+        }
+        
+        function addPostToData(post) {
+            postsData.posts.unshift(post); // Add to beginning of array
+            savePosts();
+        }
+        
+        function addCommentToPost(postId, comment) {
+            const post = postsData.posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push(comment);
+                savePosts();
+            }
+        }
+        
+        function deletePost(postId) {
+            postsData.posts = postsData.posts.filter(post => post.id !== postId);
+            savePosts();
+        }
+        
+        function deleteComment(postId, commentId) {
+            const post = postsData.posts.find(p => p.id === postId);
+            if (post) {
+                post.comments = post.comments.filter(comment => comment.id !== commentId);
+                savePosts();
+            }
+        }
+        
+        // Rendering functions
+        function renderPosts() {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+            
+            if (postsData.posts.length === 0) {
+                container.innerHTML = '<p>No posts yet. Be the first to post!</p>';
+                return;
+            }
+            
+            postsData.posts.forEach(post => {
+                const postHtml = `
+                    <div class="post" id="post-${post.id}">
+                        <div class="post-header">
+                            <span>Anonymous</span>
+                            <span>#${post.id}</span>
+                        </div>
+                        <button class="delete-btn" data-id="${post.id}">Delete</button>
+                        <div class="post-content">
+                            ${post.title ? `<h3>${post.title}</h3>` : ''}
+                            <p>${post.content}</p>
+                            ${post.image ? `<img src="${post.image.data}" alt="${post.image.name}" class="post-image">` : ''}
+                        </div>
+                        
+                        <div class="comment-form">
+                            <form class="new-comment-form" data-post-id="${post.id}">
+                                <textarea placeholder="Write a comment..." rows="2" required></textarea>
+                                <input type="file" accept="image/*">
+                                <button type="submit">Comment</button>
+                            </form>
+                        </div>
+                        
+                        <div class="comments">
+                            ${post.comments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-header">
+                                        <span>Anonymous</span>
+                                        <span>#${comment.id}</span>
+                                    </div>
+                                    <button class="delete-btn comment-delete" data-id="${comment.id}" data-post-id="${post.id}">Delete</button>
+                                    <div class="comment-content">
+                                        <p>${comment.content}</p>
+                                        ${comment.image ? `<img src="${comment.image.data}" alt="${comment.image.name}" class="comment-image">` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                container.insertAdjacentHTML('beforeend', postHtml);
+            });
+        }
+    </script>
+</body>
+</html>
