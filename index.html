@@ -6,27 +6,32 @@
     <title>MoriyaShrine - /b/ - Random</title>
     <style>
         :root {
-            --primary-color: #800080;
-            --secondary-color: #4B0082;
-            --background-color: #F0E6FF;
-            --post-color: #FFFFFF;
-            --text-color: #333333;
-            --danger-color: #FF4444;
+            --primary-color: #330000;
+            --secondary-color: #1a0000;
+            --background-color: #0d0d0d;
+            --post-color: #1a1a1a;
+            --text-color: #ff3333;
+            --text-outline: 1px 1px 0 white;
+            --danger-color: #990000;
+            --link-color: #ff6666;
         }
         
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            text-shadow: var(--text-outline);
         }
         
         header {
             background-color: var(--primary-color);
-            color: white;
+            color: var(--text-color);
             padding: 1rem;
             text-align: center;
+            border-bottom: 3px solid var(--text-color);
+            text-shadow: var(--text-outline);
         }
         
         .container {
@@ -44,10 +49,12 @@
         
         .board {
             background-color: var(--secondary-color);
-            color: white;
+            color: var(--text-color);
             padding: 0.5rem 1rem;
             border-radius: 4px;
             text-decoration: none;
+            border: 1px solid var(--text-color);
+            text-shadow: var(--text-outline);
         }
         
         .board.active {
@@ -55,29 +62,61 @@
             font-weight: bold;
         }
         
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--text-color);
+        }
+        
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            margin-right: 0.5rem;
+            border: 1px solid var(--text-color);
+            border-bottom: none;
+        }
+        
+        .nav-tab.active {
+            background-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .post-form {
             background-color: var(--post-color);
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            border: 1px solid var(--text-color);
         }
         
         .post-form textarea, .post-form input[type="text"] {
             width: 100%;
             padding: 0.5rem;
             margin-bottom: 1rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--text-color);
             border-radius: 4px;
+            background-color: #333;
+            color: var(--text-color);
+            text-shadow: var(--text-outline);
         }
         
         .post-form button {
             background-color: var(--primary-color);
-            color: white;
-            border: none;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
             padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
+            text-shadow: var(--text-outline);
         }
         
         .posts {
@@ -90,8 +129,9 @@
             background-color: var(--post-color);
             padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             position: relative;
+            border: 1px solid var(--text-color);
         }
         
         .post-header {
@@ -99,7 +139,7 @@
             justify-content: space-between;
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
-            color: #666;
+            color: var(--link-color);
         }
         
         .post-content {
@@ -110,6 +150,7 @@
             max-width: 100%;
             max-height: 300px;
             margin-bottom: 1rem;
+            border: 1px solid var(--text-color);
         }
         
         .comment-form {
@@ -119,13 +160,13 @@
         .comments {
             margin-top: 1rem;
             padding-left: 1rem;
-            border-left: 2px solid var(--secondary-color);
+            border-left: 2px solid var(--text-color);
         }
         
         .comment {
             margin-bottom: 1rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #444;
             position: relative;
         }
         
@@ -133,6 +174,7 @@
             max-width: 100%;
             max-height: 200px;
             margin-top: 0.5rem;
+            border: 1px solid var(--text-color);
         }
         
         .delete-btn {
@@ -140,12 +182,77 @@
             top: 0.5rem;
             right: 0.5rem;
             background-color: var(--danger-color);
-            color: white;
-            border: none;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
             border-radius: 4px;
             padding: 0.2rem 0.5rem;
             cursor: pointer;
             font-size: 0.8rem;
+            text-shadow: var(--text-outline);
+        }
+        
+        .timestamp {
+            font-size: 0.8rem;
+            color: var(--link-color);
+            margin-left: 0.5rem;
+        }
+        
+        /* Chatroom styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid var(--text-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: var(--post-color);
+        }
+        
+        .chat-message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background-color: var(--secondary-color);
+            border-radius: 4px;
+            border-left: 3px solid var(--text-color);
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 0.5rem;
+            background-color: var(--secondary-color);
+            border-top: 1px solid var(--text-color);
+        }
+        
+        .chat-input {
+            flex-grow: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+            background-color: #333;
+            color: var(--text-color);
+            text-shadow: var(--text-outline);
+        }
+        
+        .chat-send {
+            margin-left: 0.5rem;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            text-shadow: var(--text-outline);
+        }
+        
+        .username {
+            font-weight: bold;
+            color: var(--link-color);
         }
     </style>
 </head>
@@ -157,39 +264,94 @@
     
     <div class="container">
         <div class="board-list">
-            <a href="a.html" class="board">/a/ - Anime</a>
-            <a href="v.html" class="board">/v/ - Video Games</a>
-            <a href="g.html" class="board">/g/ - Technology</a>
-            <a href="b.html" class="board active">/b/ - Random</a>
-            <a href="mu.html" class="board">/mu/ - Music</a>
+            <a href="#" class="board" data-board="a">/a/ - Anime</a>
+            <a href="#" class="board" data-board="v">/v/ - Video Games</a>
+            <a href="#" class="board" data-board="g">/g/ - Technology</a>
+            <a href="#" class="board active" data-board="b">/b/ - Random</a>
+            <a href="#" class="board" data-board="mu">/mu/ - Music</a>
+            <a href="#" class="board" data-board="chat">/chat/ - Live Chat</a>
         </div>
         
-        <div class="post-form">
-            <h2>Create a new post</h2>
-            <form id="new-post-form">
-                <input type="text" id="post-title" placeholder="Title (optional)" maxlength="300">
-                <textarea id="post-content" placeholder="Your text here..." rows="4" required></textarea>
-                <input type="file" id="post-image" accept="image/*">
-                <button type="submit">Post</button>
-            </form>
+        <div class="nav-tabs">
+            <div class="nav-tab active" data-tab="forum">Forum</div>
+            <div class="nav-tab" data-tab="chatroom">Chatroom</div>
         </div>
         
-        <div class="posts" id="posts-container">
-            <!-- Posts will be loaded here from localStorage -->
+        <!-- Forum Tab Content -->
+        <div class="tab-content active" id="forum-content">
+            <div class="post-form">
+                <h2>Create a new post</h2>
+                <form id="new-post-form">
+                    <input type="text" id="post-title" placeholder="Title (optional)" maxlength="300">
+                    <textarea id="post-content" placeholder="Your text here..." rows="4" required></textarea>
+                    <input type="file" id="post-image" accept="image/*">
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+            
+            <div class="posts" id="posts-container">
+                <!-- Posts will be loaded here from localStorage -->
+            </div>
+        </div>
+        
+        <!-- Chatroom Tab Content -->
+        <div class="tab-content" id="chatroom-content">
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message...">
+                    <button class="chat-send" id="chat-send">Send</button>
+                </div>
+            </div>
         </div>
     </div>
     
     <script>
-        // Data structure to hold posts
-        let postsData = {
+        // Data structure to hold posts and chat messages
+        let appData = {
             currentBoard: 'b',
-            posts: []
+            posts: [],
+            chatMessages: [],
+            username: 'Anonymous-' + Math.floor(Math.random() * 10000)
         };
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Load posts from localStorage
-            loadPosts();
+            // Load data from localStorage
+            loadData();
+            
+            // Set up board navigation
+            document.querySelectorAll('.board').forEach(board => {
+                board.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    appData.currentBoard = this.dataset.board;
+                    
+                    // Update active board
+                    document.querySelectorAll('.board').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show appropriate content
+                    if (appData.currentBoard === 'chat') {
+                        document.querySelector('[data-tab="chatroom"]').click();
+                    } else {
+                        document.querySelector('[data-tab="forum"]').click();
+                        renderPosts();
+                    }
+                });
+            });
+            
+            // Set up tab navigation
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    document.getElementById(this.dataset.tab + '-content').classList.add('active');
+                });
+            });
             
             // Handle new post submission
             document.getElementById('new-post-form').addEventListener('submit', function(e) {
@@ -202,7 +364,7 @@
                 // Create a new post object
                 const newPost = {
                     id: Date.now(),
-                    board: postsData.currentBoard,
+                    board: appData.currentBoard,
                     title: title,
                     content: content,
                     image: imageFile ? {
@@ -211,7 +373,7 @@
                         data: null // Will be populated after reading
                     } : null,
                     comments: [],
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date()
                 };
                 
                 // If there's an image, read it as data URL
@@ -251,7 +413,7 @@
                             type: imageFile.type,
                             data: null // Will be populated after reading
                         } : null,
-                        timestamp: new Date().toISOString()
+                        timestamp: new Date()
                     };
                     
                     // If there's an image, read it as data URL
@@ -289,50 +451,105 @@
                     renderPosts();
                 }
             });
+            
+            // Chatroom functionality
+            const chatInput = document.getElementById('chat-input');
+            const chatSend = document.getElementById('chat-send');
+            const chatMessages = document.getElementById('chat-messages');
+            
+            chatSend.addEventListener('click', sendChatMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
+            
+            function sendChatMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    const newMessage = {
+                        id: Date.now(),
+                        user: appData.username,
+                        text: message,
+                        timestamp: new Date()
+                    };
+                    
+                    appData.chatMessages.push(newMessage);
+                    saveData();
+                    renderChatMessages();
+                    chatInput.value = '';
+                    
+                    // Auto-scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }
+            
+            // Initial renders
+            renderPosts();
+            renderChatMessages();
         });
         
         // Data management functions
-        function loadPosts() {
-            const savedData = localStorage.getItem('moriyashrine_posts');
+        function loadData() {
+            const savedData = localStorage.getItem('moriyashrine_data');
             if (savedData) {
-                postsData = JSON.parse(savedData);
+                const parsedData = JSON.parse(savedData);
+                appData.posts = parsedData.posts || [];
+                appData.chatMessages = parsedData.chatMessages || [];
+                
+                // Convert string timestamps back to Date objects
+                appData.posts.forEach(post => {
+                    post.timestamp = new Date(post.timestamp);
+                    post.comments.forEach(comment => {
+                        comment.timestamp = new Date(comment.timestamp);
+                    });
+                });
+                
+                appData.chatMessages.forEach(msg => {
+                    msg.timestamp = new Date(msg.timestamp);
+                });
             }
-            
-            // Filter posts for current board
-            const currentBoardPosts = postsData.posts.filter(post => post.board === postsData.currentBoard);
-            postsData.posts = currentBoardPosts;
-            
-            renderPosts();
         }
         
-        function savePosts() {
-            localStorage.setItem('moriyashrine_posts', JSON.stringify(postsData));
+        function saveData() {
+            localStorage.setItem('moriyashrine_data', JSON.stringify({
+                posts: appData.posts,
+                chatMessages: appData.chatMessages
+            }));
         }
         
         function addPostToData(post) {
-            postsData.posts.unshift(post); // Add to beginning of array
-            savePosts();
+            appData.posts.unshift(post); // Add to beginning of array
+            saveData();
         }
         
         function addCommentToPost(postId, comment) {
-            const post = postsData.posts.find(p => p.id === postId);
+            const post = appData.posts.find(p => p.id === postId);
             if (post) {
                 post.comments.push(comment);
-                savePosts();
+                saveData();
             }
         }
         
         function deletePost(postId) {
-            postsData.posts = postsData.posts.filter(post => post.id !== postId);
-            savePosts();
+            appData.posts = appData.posts.filter(post => post.id !== postId);
+            saveData();
         }
         
         function deleteComment(postId, commentId) {
-            const post = postsData.posts.find(p => p.id === postId);
+            const post = appData.posts.find(p => p.id === postId);
             if (post) {
                 post.comments = post.comments.filter(comment => comment.id !== commentId);
-                savePosts();
+                saveData();
             }
+        }
+        
+        // Formatting functions
+        function formatTimestamp(date) {
+            if (!(date instanceof Date)) {
+                date = new Date(date);
+            }
+            return date.toLocaleString();
         }
         
         // Rendering functions
@@ -340,17 +557,20 @@
             const container = document.getElementById('posts-container');
             container.innerHTML = '';
             
-            if (postsData.posts.length === 0) {
+            // Filter posts for current board
+            const boardPosts = appData.posts.filter(post => post.board === appData.currentBoard);
+            
+            if (boardPosts.length === 0) {
                 container.innerHTML = '<p>No posts yet. Be the first to post!</p>';
                 return;
             }
             
-            postsData.posts.forEach(post => {
+            boardPosts.forEach(post => {
                 const postHtml = `
                     <div class="post" id="post-${post.id}">
                         <div class="post-header">
                             <span>Anonymous</span>
-                            <span>#${post.id}</span>
+                            <span>#${post.id} <span class="timestamp">${formatTimestamp(post.timestamp)}</span></span>
                         </div>
                         <button class="delete-btn" data-id="${post.id}">Delete</button>
                         <div class="post-content">
@@ -372,7 +592,7 @@
                                 <div class="comment">
                                     <div class="comment-header">
                                         <span>Anonymous</span>
-                                        <span>#${comment.id}</span>
+                                        <span>#${comment.id} <span class="timestamp">${formatTimestamp(comment.timestamp)}</span></span>
                                     </div>
                                     <button class="delete-btn comment-delete" data-id="${comment.id}" data-post-id="${post.id}">Delete</button>
                                     <div class="comment-content">
@@ -387,6 +607,29 @@
                 
                 container.insertAdjacentHTML('beforeend', postHtml);
             });
+        }
+        
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+            
+            if (appData.chatMessages.length === 0) {
+                container.innerHTML = '<p>No messages yet. Say something!</p>';
+                return;
+            }
+            
+            appData.chatMessages.forEach(msg => {
+                const msgHtml = `
+                    <div class="chat-message">
+                        <div><span class="username">${msg.user}</span> <span class="timestamp">${formatTimestamp(msg.timestamp)}</span></div>
+                        <div>${msg.text}</div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', msgHtml);
+            });
+            
+            // Auto-scroll to bottom
+            container.scrollTop = container.scrollHeight;
         }
     </script>
 </body>
